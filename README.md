@@ -184,6 +184,14 @@ To deploy the app on AWS EC2 using Docker:
 
 ---
 
+## 🧩 Design Decisions
+   - **Django REST Framework (DRF):** Provides robust, flexible API support.
+   - **Redis Cache:** Reduces API latency by caching note details and translations.
+   - **JWT Authentication:** Ensures secure token-based access.
+   - **Docker:** Simplifies deployment and local testing.
+   - **SQLite → PostgreSQL Ready:** Easily extendable to production-grade database.
+
+---
 ## ⚠️ Known Limitations / Next Steps
    - Currently supports only English ↔ Hindi translations
    - Basic error messages; can be improved for UX
