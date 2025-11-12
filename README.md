@@ -159,8 +159,38 @@ To deploy the app on AWS EC2 using Docker:
 | `GET` | `/stats/` | Get user’s translation statistics (total notes, translations, and breakdown by language) |
 
 
+---
 
+## 🧩 Design Overview
 
+### 🏗️ High-Level Design (HLD)
+
+ - User interacts via REST API → DRF views
+ - Each user can have multiple notes
+ - Each note can have a translated version (1-to-1 via Translating model)
+ - Translator API handles text translation
+ - Cache layer optimizes repeated translations
+ - Stats endpoint aggregates usage metrics
+
+### ⚙️ Low-Level Design (LLD)
+
+ - Models: `User`, `Note`, `Translating`, `Stats`
+ - Relationships: One-to-Many (User → Notes), One-to-One (Note → Translating)
+ - Translation Flow:
+      - Check cache → Use existing translation → Update count
+      - Else call external API → Store → Return response
+ - Error Handling:
+      - All views wrapped in try-except blocks for safety
+
+---
+
+## ⚠️ Known Limitations / Next Steps
+   - Currently supports only English ↔ Hindi translations
+   - Basic error messages; can be improved for UX
+   - Caching logic can be expanded for translated text
+   - Add more language support (via configurable API targets)
+   - Add frontend (React/Vue) for better interactivity
+   - Add unit tests for translation and stats endpoints
 
 
 
