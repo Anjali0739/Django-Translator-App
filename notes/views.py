@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from rest_framework.decorators import  permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from .serializer import NotesSerializer
+from django.core.cache import cache
 
 # Create your views here.
 @api_view(['GET', 'POST'])
@@ -35,9 +36,21 @@ def createnotes(request):
 def getnotes(request, id):
     user = request.user
     if request.method == "GET":
-        note = user.user_notes.get(id=id)
-        resp =NotesSerializer(note)
-        return JsonResponse(data= resp.data, status=200)
+        cache_key = f"{user.id}_{id}"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            cache.set(cache_key, cached_data, timeout=300)
+            return JsonResponse(data=cached_data, status=200)
+
+        try:
+            note = user.user_notes.get(id=id)
+        except:
+            return JsonResponse({"error": "Note not found"}, status=404)
+        resp =NotesSerializer(note).data
+        cache.set(cache_key, resp, timeout=300)
+        return JsonResponse(data=resp, status=200)
+        
+            
 
     elif request.method == "PUT":
         note = user.user_notes.get(id=id)
