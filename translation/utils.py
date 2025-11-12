@@ -1,7 +1,8 @@
 import requests
+from django.conf import settings
 
 def translate_text(text, source, target):
-    url = "https://655.mtis.workers.dev/translate"
+    url = settings.TRANSLATOR_URL
     params = {
         "text": text,
         "source_lang": source,
