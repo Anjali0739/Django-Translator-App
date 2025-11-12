@@ -10,7 +10,11 @@ from .models import Translating
 @permission_classes([IsAuthenticated])
 def tranlate(request, id):
     user=request.user
-    note = user.user_notes.get(id=id)
+    try:
+        note = user.user_notes.get(id=id)
+    except:
+        return JsonResponse({"status": "error", "message": "Note not found"},status=404)
+    
     text = note.text
     translated = ""
     try:
@@ -18,8 +22,8 @@ def tranlate(request, id):
         translated = translated_response.translated_text
         translated_response.count = translated_response.count + 1
         translated_response.save()
-    except Exception:
-        print("not in cache")
+    except:
+        print(f"Translation lookup failed for note_id: {id} in database. Running new Translation")
 
     if translated == "":
         source = note.language
@@ -31,6 +35,6 @@ def tranlate(request, id):
             source='hi'
 
         translated = translate_text(text, source, target)
-        text_translated = Translating.objects.create(note_id=note, translated_text= translated)
-    return JsonResponse(data={"Text": text, "Translated text":translated}, status=200)
+        Translating.objects.create(note_id=note, translated_text= translated)
+    return JsonResponse(data={"status":"success", "Text": text, "Translated text":translated}, status=200)
     

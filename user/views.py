@@ -12,12 +12,11 @@ def register(request):
         username = data.get("username")
         password = data.get("password")
         
+        if not username or not password:
+            return JsonResponse({"status": "error", "message": "Username and password are required"}, status=400)
+
         obj = User.objects.create_user(username=username, password=password)
         obj.save()
-        return JsonResponse(
-            data={"message": "user registered successfully"}, status = 202
-        )
+        return JsonResponse({"status": "success", "message": "User registered successfully"}, status = 201)
     else:
-        return JsonResponse(
-            data={"message": "invalid method"}, status=405
-        )
+        return JsonResponse({"status": "error", "message": "Invalid HTTP method"}, status=405)
